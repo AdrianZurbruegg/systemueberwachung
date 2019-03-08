@@ -2,9 +2,61 @@
 param(
     [Parameter()]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet('Windows', 'Linux')]
+    [ValidateSet('Windows', 'Linux', 'Debug')]
     [string]$hostSystem=$(throw "Operating system is mandatory, please provide the value 'Windows' or 'Linux'")
 )
+
+
+
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+# This bit of code establishes the Database connection.
+# Load windows assembly (Connector/.NET driver)
+[System.Reflection.Assembly]::LoadWithPartialName("MySql.Data")
+
+
+# Build connection string for database.
+[string]$sMySQLUserName = 'admin'
+[string]$sMySQLPW = 'London99!'
+[string]$sMySQLDB = 'systemueberwachung'
+[string]$sMySQLHost = '10.0.100.104'
+[string]$sConnectionString = "server="+$sMySQLHost+";port=3306;uid=" + $sMySQLUserName + ";pwd=" + $sMySQLPW + ";database="+$sMySQLDB
+
+# Open database connection.
+$oConnection = New-Object MySql.Data.MySqlClient.MySqlConnection($sConnectionString)
+$Error.Clear()
+try
+{
+    $oConnection.Open()
+}
+catch
+{
+    Write-Warning("Could not open a connection to Database $sMySQLDB on Host $sMySQLHost. Error: "+$Error[0].ToString())
+}
+
+
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+# Get an instance of all objects need for a SELECT query. The Command object
+$oMYSQLCommand = New-Object MySql.Data.MySqlClient.MySqlCommand
+# DataAdapter Object
+$oMYSQLDataAdapter = New-Object MySql.Data.MySqlClient.MySqlDataAdapter
+# And the DataSet Object
+$oMYSQLDataSet = New-Object System.Data.DataSet
+# Assign the established MySQL connection
+$oMYSQLCommand.Connection=$oConnection
+# Define a SELECT query
+$oMYSQLCommand.CommandText='SELECT * from availabilityClass'
+$oMYSQLDataAdapter.SelectCommand=$oMYSQLCommand
+# Execute the query
+$iNumberOfDataSets=$oMYSQLDataAdapter.Fill($oMYSQLDataSet, "data")
+
+foreach($oDataSet in $oMYSQLDataSet.tables[0])
+{
+    write-host "Klasse:" $oDataSet.type
+}
 
 # Get hostname of the system.
 $hostname = hostname
