@@ -1,58 +1,84 @@
-﻿# Get hostname of the system.
-$hostname = hostname
-$hostname
+﻿# Gets some basic information of the system. (Function has more than 20 lines, since a certain amount of information is required)
+function getBasicInfo{
+    # Get hostname of the system.
+    $hostname = hostname
+    $hostname
 
-# Note: all network specific informations are only about IPv4 .  
-    
-# Get IP-Address.
-$networkInfo = Get-NetIPConfiguration
-$ipAddress = $networkInfo.IPv4Address.IPAddress
-$ipAddress
+    # Note: all network specific informations are only about IPv4 .
 
-# Get subnetmask.
-$subnetmask = Get-WmiObject Win32_NetworkAdapterConfiguration
-$subnetmask = $subnetmask.IPSubnet[0]
-$subnetmask
+    # Get IP-Address.
+    $networkInfo = Get-NetIPConfiguration
+    $ipAddress = $networkInfo.IPv4Address.IPAddress
+    $ipAddress
 
-# Get gateway.
-$gateway = $networkInfo.IPv4DefaultGateway.NextHop
-$gateway
+    # Get subnetmask.
+    $subnetmask = Get-WmiObject Win32_NetworkAdapterConfiguration
+    $subnetmask = $subnetmask.IPSubnet[0]
+    $subnetmask
 
-# Get DNS-Servers.
-$dnsServer = $networkInfo.DNSServer.ServerAddresses
-$dnsServer
+    # Get gateway.
+    $gateway = $networkInfo.IPv4DefaultGateway.NextHop
+    $gateway
 
-# Get disks (Volume & Partition)
-$volumes = Get-Partition | Get-Volume | Select-Object -Property DriveLetter, FileSystemLabel, FileSystem, HealthStatus, OperationalStatus, @{n="Size";e={[math]::Round($_.Size/1GB,2)}}, @{n="Used";e={[math]::Round([math]::Round($_.Size/1GB,2) - [math]::Round($_.SizeRemaining/1GB,2),2)}} | ConvertTo-Csv -NoTypeInformation | Select-Object -Skip 1 | % {$_ -replace '"', ''} | % {$_ -replace ' ', ''} | Sort-Object -Descending
-$volumes
+    # Get DNS-Servers.
+    $dnsServer = $networkInfo.DNSServer.ServerAddresses
+    $dnsServer
 
-# Get CPU processors.
-$computerInfo = Get-ComputerInfo
-$processor = $computerInfo.CsProcessors.Name[0]
-$processor
+    # Get disks (Volume & Partition)
+    $volumes = Get-Partition | Get-Volume | Select-Object -Property DriveLetter, FileSystemLabel, FileSystem, HealthStatus, OperationalStatus, @{n="Size";e={[math]::Round($_.Size/1GB,2)}}, @{n="Used";e={[math]::Round([math]::Round($_.Size/1GB,2) - [math]::Round($_.SizeRemaining/1GB,2),2)}} | ConvertTo-Csv -NoTypeInformation | Select-Object -Skip 1 | % {$_ -replace '"', ''} | % {$_ -replace ' ', ''} | Sort-Object -Descending
+    $volumes
 
-$cores = $computerInfo.CsNumberOfProcessors
-$cores
+    # Get CPU processors.
+    $computerInfo = Get-ComputerInfo
+    $processor = $computerInfo.CsProcessors.Name[0]
+    $processor
 
-$logicalCores = $computerInfo.CsNumberOfLogicalProcessors
-$logicalCores
+    $cores = $computerInfo.CsNumberOfProcessors
+    $cores
 
-# Get RAM amount.
-$ram = $computerInfo.CsTotalPhysicalMemory
-$ram = [Math]::Round($ram / 1GB)
-$ram
+    $logicalCores = $computerInfo.CsNumberOfLogicalProcessors
+    $logicalCores
 
-# Get operating system  & manufacturer info.
-$operatingSystem = $computerInfo.OsName
-$operatingSystem
+    # Get RAM amount.
+    $ram = $computerInfo.CsTotalPhysicalMemory
+    $ram = [Math]::Round($ram / 1GB)
+    $ram
 
-$manufacturerInfo = $computerInfo.CsManufacturer + " " + $computerInfo.CsModel
-$manufacturerInfo
+    # Get operating system  & manufacturer info.
+    $operatingSystem = $computerInfo.OsName
+    $operatingSystem
 
-# Get system uptime.
-[string]$days = $computerInfo.OsUptime.Days
-[string]$hours = $computerInfo.OsUptime.Hours
-[string]$minutes = $computerInfo.OsUptime.Minutes
-[string]$seconds = $computerInfo.OsUptime.Seconds
-$uptime = "Days:" + $days + " Hours:" + $hours + " Minutes:" + $minutes + " Seconds:" + $seconds
-$uptime
+    $manufacturerInfo = $computerInfo.CsManufacturer + " " + $computerInfo.CsModel
+    $manufacturerInfo
+
+    # Get system uptime.
+    [string]$days = $computerInfo.OsUptime.Days
+    [string]$hours = $computerInfo.OsUptime.Hours
+    [string]$minutes = $computerInfo.OsUptime.Minutes
+    [string]$seconds = $computerInfo.OsUptime.Seconds
+    $uptime = "Days:" + $days + " Hours:" + $hours + " Minutes:" + $minutes + " Seconds:" + $seconds
+    $uptime
+}
+
+# Gets perfomance specific information about the system.
+function getPerformanceInfo{
+
+    # Get disk usage in percent.
+    $diskUsage = Get-Partition | Get-Volume | Select-Object -Property DriveLetter, @{n="Percentage";e={[math]::Round(100-($_.SizeRemaining*100/$_.Size))}} | ConvertTo-Csv -NoTypeInformation | Select-Object -Skip 1 | % {$_ -replace '"',''} | % {$_ -replace ' ',''} | Sort-Object -Descending
+    $diskUsage
+
+    # Get CPU usage in percent.
+    $cpuUsage = Get-WmiObject win32_processor | Measure-Object -property LoadPercentage -Average | Select Average
+    $cpuUsage = $cpuUsage.Average
+    $cpuUsage
+
+    # Get RAM usage in percent.
+    $os = Get-Ciminstance Win32_OperatingSystem
+    $ramUsage = [math]::Round(100-($os.FreePhysicalMemory/$os.TotalVisibleMemorySize)*100,2)
+    $ramUsage
+
+}
+
+# Call functions.
+getBasicInfo
+getPerformanceInfo
