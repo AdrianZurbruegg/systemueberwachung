@@ -1,0 +1,21 @@
+html {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+header, body, footer {
+    padding-left: 350px;
+}
+
+.user-view {
+    height: 15vh;
+}
+
+.nav-text, .collapsible {
+    padding-left: 32px;
+}
+
+.credits p {
+    position: absolute;
+    bottom: 0;
+    padding-bottom: 50px;
+}
