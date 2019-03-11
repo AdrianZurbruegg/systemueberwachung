@@ -4,6 +4,31 @@
  * Homepage. Here you have a little overview and little instruction how to use the tool.
  * Also here is the login, which you need to do before you can access any server data.
  */
+
+include('connection.php');
+session_start();
+
+// If login button clicked, search credentials in database
+if (isset($_POST['anmeldenButton'])) {
+
+    $usernameLogin = htmlspecialchars($_POST['login-username']);
+    $passwortLogin = $_POST['login-password'];
+    $statement = $pdo->prepare("SELECT * FROM user WHERE username = '$usernameLogin'");
+    $statement->execute();
+    $user = $statement->fetch();
+    $passwordHash = $user['password'];
+
+    // Check if password is correct //
+    if ($user['username'] == $usernameLogin && password_verify($passwortLogin, $passwordHash)) {
+        $_SESSION['username'] = $user['username'];
+        header('Location: serverList.php');
+    } else {
+        // Feedback: credentials are incorrect //
+        $wrongCredentials = "<script>alert('Benutzerdaten stimmen nicht')</script>";
+        echo $wrongCredentials;
+    }
+}
+
 ?>
 
 <html lang="de">
@@ -21,6 +46,7 @@
     <script src='js/materialize.js' type='text/javascript'></script>
     <script src='js/materialize.min.js' type='text/javascript'></script>
 </head>
+<!-- START: Navigation ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 <ul id="slide-out" class="sidenav sidenav-fixed">
     <li>
         <div class="user-view">
@@ -29,17 +55,24 @@
             </div>
         </div>
     </li>
-    <p><span class="black-text name nav-text">Angemeldet als:</span></p>
-    <li><a>Abmelden</a></li>
-    <div class="divider"></div>
-
+    <!-- Show username and a logout option if user is logged in -->
+    <?php if (isset($_SESSION["username"])) {
+        $sessionuser = $_SESSION['username']; ?>
+        <p><span class="black-text name nav-text">Angemeldet als: <?php echo $sessionuser; ?></span></p>
+        <li><a href="logout.php">Abmelden</a></li>
+        <div class="divider"></div>
+        <?php
+    } ?>
     <li><a href="index.php">Home</a></li>
+    <li><a href="serverList.php">Server Liste</a></li>
     <div class="divider"></div>
     <div class="credits">
         <p>Made by Adrian Zurbrügg <b>|</b> IPA-Projekt 2019</p>
     </div>
 </ul>
+<!-- END: Navigation ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------>
 <br>
+<!-- START: Card ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 <div class="row">
     <div class="col s12 m11 l10">
         <div class="card blue-grey darken-1">
@@ -60,6 +93,7 @@
                 </ul>
             </div>
             <div class="card-content grey lighten-4">
+                <!-- START: Login tab ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
                 <div id="index_login">
                     <form method="post" enctype="multipart/form-data">
                         <div class="card-content grey lighten-4">
@@ -77,6 +111,9 @@
                         </div>
                     </form>
                 </div>
+                <!-- END: Login tab --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+
+                <!-- START: Instruction tab ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
                 <div id="index_instruction">
                     <ul>
                         <li><b>1. Serverliste</b></li>
@@ -100,6 +137,9 @@
                         </li>
                     </ul>
                 </div>
+                <!-- END: Instruction tab --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+
+                <!-- START: News tab -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
                 <div id="index_news">
                     Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
                     dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet
@@ -107,10 +147,12 @@
                     consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
                     sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
                 </div>
+                <!-- END: New tab ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
             </div>
         </div>
     </div>
 </div>
+<!-- END: Card ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------>
 
 <script type="application/x-javascript">
     $(document).ready(function () {
