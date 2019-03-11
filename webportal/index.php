@@ -4,6 +4,30 @@
  * Homepage. Here you have a little overview and little instruction how to use the tool.
  * Also here is the login, which you need to do before you can access any server data.
  */
+
+include('connection.php');
+session_start();
+
+// If login button clicked, search credentials in database
+if (isset($_POST['anmeldenButton'])) {
+
+    $usernameLogin = htmlspecialchars($_POST['login-username']);
+    $passwortLogin = $_POST['login-password'];
+    $statement = $pdo->prepare("SELECT * FROM user WHERE username = '$usernameLogin'");
+    $statement->execute();
+    $user = $statement->fetch();
+    $passwordHash = $user['password'];
+
+    // Check if password is correct //
+    if ($user['username'] == $usernameLogin && password_verify($passwortLogin, $passwordHash)) {
+        $_SESSION['username'] = $user['username'];
+        header('Location: serverList.php');
+    } else {
+        // Feedback: credentials are incorrect //
+        $wrongCredentials = "<script>alert('Benutzerdaten stimmen nicht')</script>";
+        echo $wrongCredentials;
+    }
+}
 ?>
 
 <html lang="de">
@@ -21,6 +45,7 @@
     <script src='js/materialize.js' type='text/javascript'></script>
     <script src='js/materialize.min.js' type='text/javascript'></script>
 </head>
+<body>
 <ul id="slide-out" class="sidenav sidenav-fixed">
     <li>
         <div class="user-view">
@@ -29,11 +54,16 @@
             </div>
         </div>
     </li>
-    <p><span class="black-text name nav-text">Angemeldet als:</span></p>
-    <li><a>Abmelden</a></li>
-    <div class="divider"></div>
-
+    <!-- Show username and a logout option if user is logged in -->
+    <?php if (isset($_SESSION["username"])) {
+        $sessionuser = $_SESSION['username']; ?>
+        <p><span class="black-text name nav-text">Angemeldet als: <?php echo $sessionuser; ?></span></p>
+        <li><a href="logout.php">Abmelden</a></li>
+        <div class="divider"></div>
+        <?php
+    } ?>
     <li><a href="index.php">Home</a></li>
+    <li><a href="serverList.php">Server Liste</a></li>
     <div class="divider"></div>
     <div class="credits">
         <p>Made by Adrian Zurbrügg <b>|</b> IPA-Projekt 2019</p>
