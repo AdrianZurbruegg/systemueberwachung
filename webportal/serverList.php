@@ -13,12 +13,12 @@ if (!isset($_SESSION["username"])) {
     header("location: index.php");
 }
 
-// Select required information for windows systems.
+// Select required information for windows systems. MAX(id) is used to limit the results to the latest entry.
 $statementWindows = $pdo->prepare("SELECT hostInfo.*, availabilityClass.type, availabilityInfo.ID as a_id, availabilityInfo.ping, availabilityInfo.cDate, basicInfo.operatingSystem FROM hostInfo JOIN availabilityClass on hostInfo.availabilityClass_id = availabilityClass.ID JOIN availabilityInfo on hostInfo.ID = availabilityInfo.hostInfo_id JOIN basicInfo on hostInfo.ID = basicInfo.hostInfo_ID WHERE hostSystem = 'Windows' AND availabilityInfo.ID IN (SELECT MAX(id) FROM availabilityInfo GROUP BY hostInfo_id)");
 $statementWindows->execute();
 $resultWindows = $statementWindows->fetchAll();
 
-// Select required information for linux systems.
+// Select required information for linux systems. MAX(id) is used to limit the results to the latest entry.
 $statementLinux = $pdo->prepare("SELECT hostInfo.*, availabilityClass.type, availabilityInfo.ID as a_id, availabilityInfo.ping, availabilityInfo.cDate, basicInfo.operatingSystem FROM hostInfo JOIN availabilityClass on hostInfo.availabilityClass_id = availabilityClass.ID JOIN availabilityInfo on hostInfo.ID = availabilityInfo.hostInfo_id JOIN basicInfo on hostInfo.ID = basicInfo.hostInfo_ID WHERE hostSystem = 'Linux' AND availabilityInfo.ID IN (SELECT MAX(id) FROM availabilityInfo GROUP BY hostInfo_id)");
 $statementLinux->execute();
 $resultLinux = $statementLinux->fetchAll();
@@ -73,8 +73,13 @@ $resultLinux = $statementLinux->fetchAll();
 <div class="content_serverList">
     <!-- Windows Server -->
     <div class="row">
+        <h4 class="col s4 m8">Windows Systeme:</h4>
+        <div class="input-field col m2 ">
+            <i class="material-icons prefix">search</i>
+            <input id="search_windows" type="text" onkeyup="search('tbl_serverListWindows', 'search_windows')">
+            <label for="search_windows">Suche</label>
+        </div>
         <div class="col s12 m11">
-            <h4>Windows Systeme:</h4>
             <div class="table-wrapper z-depth-2">
                 <div class="table-scroll">
                     <table id="tbl_serverListWindows" class="highlight tbl_serverList">
@@ -106,8 +111,13 @@ $resultLinux = $statementLinux->fetchAll();
     </div>
     <!-- Linux Server -->
     <div class="row">
+        <h4 class="col s4 m8">Linux Systeme:</h4>
+        <div class="input-field col m2 ">
+            <i class="material-icons prefix">search</i>
+            <input id="search_linux" type="text" onkeyup="search('tbl_serverListLinux', 'search_linux')">
+            <label for="search_linux">Suche</label>
+        </div>
         <div class="col s12 m11">
-            <h4>Linux Systeme:</h4>
             <div class="table-wrapper  z-depth-2">
                 <div class="table-scroll">
                     <table id="tbl_serverListLinux" class="highlight tbl_serverList">
@@ -169,6 +179,46 @@ $resultLinux = $statementLinux->fetchAll();
             ping[i].style.backgroundColor = 'red';
         }
     }
+
+    // Function which searches in the specified table.
+    // Parameters:
+    // tableId = id of the table (string)
+    // inputId = id of the input field where the cellContent is written in. (string)
+
+    function search(tableId, inputId) {
+        var input, filter, table, tr, td, td1, td2, td3, td4, td5, i, cleanedFilter;
+        input = document.getElementById(inputId);
+        filter = input.value.toUpperCase();
+        table = document.getElementById(tableId);
+        tr = table.getElementsByTagName("tr");
+
+        cleanedFilter = filter
+
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[0];
+            td1 = tr[i].getElementsByTagName("td")[1];
+            td2 = tr[i].getElementsByTagName("td")[2];
+            td3 = tr[i].getElementsByTagName("td")[3];
+            td4 = tr[i].getElementsByTagName("td")[4];
+            td5 = tr[i].getElementsByTagName("td")[5];
+
+            if (td) {
+                cellContent = td.innerHTML.toUpperCase()
+                cellContent1 = td1.innerHTML.toUpperCase()
+                cellContent2 = td2.innerHTML.toUpperCase()
+                cellContent3 = td3.innerHTML.toUpperCase()
+                cellContent4 = td4.innerHTML.toUpperCase()
+                cellContent5 = td5.innerHTML.toUpperCase()
+
+                if (cellContent.indexOf(cleanedFilter) > -1 || cellContent1.indexOf(cleanedFilter) > -1 || cellContent2.indexOf(cleanedFilter) > -1 || cellContent3.indexOf(cleanedFilter) > -1 || cellContent4.indexOf(cleanedFilter) > -1 || cellContent5.indexOf(cleanedFilter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
 
 </script>
 </body>
