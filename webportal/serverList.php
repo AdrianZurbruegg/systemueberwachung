@@ -73,23 +73,23 @@ $resultLinux = $statementLinux->fetchAll();
 <div class="content_serverList">
     <!-- Windows Server -->
     <div class="row">
-        <h4 class="col s4 m8">Windows Systeme:</h4>
-        <div class="input-field col m2 ">
+        <h4 class="col m9">Windows Systeme:</h4>
+        <div class="input-field col">
             <i class="material-icons prefix">search</i>
             <input id="search_windows" type="text" onkeyup="search('tbl_serverListWindows', 'search_windows')">
             <label for="search_windows">Suche</label>
         </div>
-        <div class="col s12 m11">
+        <div class="col">
             <div class="table-wrapper z-depth-2">
                 <div class="table-scroll">
                     <table id="tbl_serverListWindows" class="highlight tbl_serverList">
                         <tr>
                             <th width="8%">Ping:</th>
-                            <th>Hostname:</th>
-                            <th>Administrator:</th>
+                            <th width="10%">Hostname:</th>
+                            <th width="10%">Administrator:</th>
                             <th width="20%">Betriebssystem:</th>
-                            <th>Verfügbarkeitsklasse:</th>
-                            <th width="40%">Beschreibung:</th>
+                            <th width="17%">Verfügbarkeitsklasse:</th>
+                            <th width="35%">Beschreibung:</th>
                         </tr>
                         <?php foreach ($resultWindows as $row) { ?>
                             <tr>
@@ -111,23 +111,23 @@ $resultLinux = $statementLinux->fetchAll();
     </div>
     <!-- Linux Server -->
     <div class="row">
-        <h4 class="col s4 m8">Linux Systeme:</h4>
-        <div class="input-field col m2 ">
+        <h4 class="col m9">Linux Systeme:</h4>
+        <div class="input-field col">
             <i class="material-icons prefix">search</i>
             <input id="search_linux" type="text" onkeyup="search('tbl_serverListLinux', 'search_linux')">
             <label for="search_linux">Suche</label>
         </div>
-        <div class="col s12 m11">
-            <div class="table-wrapper  z-depth-2">
+        <div class="col">
+            <div class="table-wrapper z-depth-2">
                 <div class="table-scroll">
                     <table id="tbl_serverListLinux" class="highlight tbl_serverList">
                         <tr>
                             <th width="8%">Ping:</th>
-                            <th>Hostname:</th>
-                            <th>Administrator:</th>
+                            <th width="10%">Hostname:</th>
+                            <th width="10%">Administrator:</th>
                             <th width="20%">Betriebssystem:</th>
-                            <th>Verfügbarkeitsklasse:</th>
-                            <th width="40%">Beschreibung:</th>
+                            <th width="17%">Verfügbarkeitsklasse:</th>
+                            <th width="35%">Beschreibung:</th>
                         </tr>
                         <?php foreach ($resultLinux as $row) { ?>
                             <tr>
@@ -184,7 +184,6 @@ $resultLinux = $statementLinux->fetchAll();
     // Parameters:
     // tableId = id of the table (string)
     // inputId = id of the input field where the cellContent is written in. (string)
-
     function search(tableId, inputId) {
         var input, filter, table, tr, td, td1, td2, td3, td4, td5, i, cleanedFilter;
         input = document.getElementById(inputId);
