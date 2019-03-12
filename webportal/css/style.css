@@ -57,6 +57,10 @@ td a{
     width: 150vh;
 }
 
+.content_serverList{
+    margin-top: -20px;
+}
+
 /* Sets the background color of hovered element */
 #tbl_serverListWindows tr:hover, #tbl_serverListLinux tr:hover {
     background-color: #ccc;
@@ -81,8 +85,16 @@ td a{
     padding-bottom: 50px;
 }
 
+/* Change design for dropdown lists */
+.dropdown {
+    background-color: #f5f5f5;
+    border: 1px solid rgba(0, 0, 0, 0.30);
+}
 
-
+/* Class for bold fonts */
+.bold {
+    font-weight: bold;
+}
 
 /* The following lines change the layout of materialize.css elements ----------------------------------------------------------------------------------------- */
 
@@ -123,7 +135,7 @@ textarea.materialize-textarea:focus:not([readonly]) {
     box-shadow: 0 1px 0 0 #546e7a;
 }
 
-/* Change color of input-field labels */
+/* Change color of input-field labels and textarea */
 input:not([type]):focus:not([readonly]) + label,
 input[type=text]:not(.browser-default):focus:not([readonly]) + label,
 input[type=password]:not(.browser-default):focus:not([readonly]) + label,

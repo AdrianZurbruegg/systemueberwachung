@@ -26,7 +26,6 @@ $resultLinux = $statementLinux->fetchAll();
 
 ?>
 
-<!doctype html>
 <html lang="de">
 <head>
     <title>test</title>
