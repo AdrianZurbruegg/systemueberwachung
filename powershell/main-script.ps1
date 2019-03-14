@@ -2,11 +2,10 @@
 # It works for both windows and linux systems.
 # The collected information will be stored in a database.
 # Autor: Adrian Zurbrügg
+# Version: 1.1.0
 
 
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
+# START: Parameter ------------------------------------------------------------------------------------------------------------------------------------------------
 # Parameter with which the user declares what type of system the script is running on.
 param(
     [Parameter()]
@@ -19,10 +18,10 @@ param(
     [string]$debugStatus=$(throw "Debug status is mandatory, please provide the value 'standard' or 'debug'")
 )
 
+# END: Parameter --------------------------------------------------------------------------------------------------------------------------------------------------
 
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
+# START: Database connection --------------------------------------------------------------------------------------------------------------------------------------
 # This bit of code establishes the Database connection.
 
 # These 2 if loops decide which assembly to load. (Windows or Linux) This is required to enable the database connection.
@@ -56,10 +55,10 @@ catch
     Write-Warning("Could not open a connection to Database $sMySQLDB on Host $sMySQLHost. Error: "+$Error[0].ToString())
 }
 
+# END: Database connection ----------------------------------------------------------------------------------------------------------------------------------------
 
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
+# START: Functions ------------------------------------------------------------------------------------------------------------------------------------------------
 # Declare functions which both (Windows & Linux) uses to insert data to the database.
 
 # Inserts or updates host data in the database. It performs an update if the hostname already exists, else an insert.
@@ -92,18 +91,18 @@ function insertDataPerfomanceInfo($hostname, $diskUsage, $cpuUsage, $ramUsage){
 # Insert placeholder value in availabilityInfo. This is necessary because otherwise a newly added server
 # will not be displayed on the website until a corresponding entry has been generated in the availabilityInfo table.
 # This placeholder bridges the time until the availability script runs and generates an entry.
-function insertDataAvailabilityInfo($ping, $ipAddress){
+function i_or_u_availabilityInfoPlaceholder($ping, $ipAddress){
 
-    # insertAvailabilityInfo is a procedure in the database, so all we do here is call the procedure with some parameters.
+    # i_or_u_availabilityInfoPlaceholder is a procedure in the database, so all we do here is call the procedure with some parameters.
     $insertQuery = "call i_or_u_availabilityInfoPlaceholder('$ping', '$ipAddress');"
     $oMYSQLCommand = New-Object MySql.Data.MySqlClient.MySqlCommand $insertQuery, $oConnection
     $iRowsAffected=$oMYSQLCommand.ExecuteNonQuery()
 }
 
+# END: Functions --------------------------------------------------------------------------------------------------------------------------------------------------
 
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
+# START: Collecting data ------------------------------------------------------------------------------------------------------------------------------------------
 # Depending on which parameter was specified, the script runs for windows or linux.
 # The script collects the same data for both operating systems and calls the corresponding functions to insert it to the database.
 
@@ -160,7 +159,7 @@ if ($hostSystem -eq 'windows' -and $debugStatus -eq 'standard'){
         $uptime = "Days:" + $days + " Hours:" + $hours + " Minutes:" + $minutes + " Seconds:" + $seconds
 
         insertDataBasicInfo($hostname) ($ipAddress) ($subnetmask) ($gateway) ($dnsServer) ($volumes) ($processor) ($cores) ($logicalCores) ($ram) ($operatingSystem) ($manufacturerInfo) ($uptime)
-        insertDataAvailabilityInfo(2) ($ipAddress)
+        i_or_u_availabilityInfoPlaceholder(2) ($ipAddress)
     }
 
 
@@ -239,7 +238,7 @@ if ($hostSystem -eq 'linux'  -and $debugStatus -eq 'standard'){
         $uptime = "Days:" + $days + " Hours:" + $hours + " Minutes:" + $minutes + " Seconds:" + $seconds
 
         insertDataBasicInfo($hostname) ($ipAddress) ($subnetmask) ($gateway) ($dnsServer) ($volumes) ($processor) ($cores) ($logicalCores) ($ram) ($operatingSystem) ($manufacturerInfo) ($uptime)
-        insertDataAvailabilityInfo(2) ($ipAddress)
+        i_or_u_availabilityInfoPlaceholder(2) ($ipAddress)
     }
 
 
@@ -265,7 +264,7 @@ if ($hostSystem -eq 'linux'  -and $debugStatus -eq 'standard'){
     getPerformanceInfo
 }
 
-
+# END: Collecting data --------------------------------------------------------------------------------------------------------------------------------------------
 
 
 # START: Debug functions ------------------------------------------------------------------------------------------------------------------------------------------
@@ -436,3 +435,5 @@ if ($hostSystem -eq 'linux'  -and $debugStatus -eq 'debug'){
     getBasicInfo
     getPerformanceInfo
 }
+
+# END: Debug functions --------------------------------------------------------------------------------------------------------------------------------------------
