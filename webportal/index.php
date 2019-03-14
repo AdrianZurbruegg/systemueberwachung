@@ -73,17 +73,13 @@ if (isset($_POST['anmeldenButton'])) {
 <!-- END: Navigation ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------>
 <br>
 <!-- START: Card ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
-<div class="row">
+<div class="row content_index">
     <div class="col s12 m11 l10">
         <div class="card blue-grey darken-1">
             <div class="card-content white-text">
-                <span class="card-title">Information</span>
-                <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
-                    dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet
-                    clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet,
-                    consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
-                    sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no
-                    sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+                <span class="card-title">Systemüberwachung</span>
+                <p>Die hier ersichtlichen Informationen, ermöglichen eine schnelle Übersicht der entsprechenden Server.</p>
+                <p>Melden Sie sich an um die Daten der registrierten Server einzusehen. </p>
             </div>
             <div class="card-tabs">
                 <ul class="tabs tabs-fixed-width">
@@ -117,21 +113,31 @@ if (isset($_POST['anmeldenButton'])) {
                 <div id="index_instruction">
                     <ul>
                         <li><b>1. Serverliste</b></li>
-                        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p><br>
+                        <p>Hier sind alle Systeme erfasst. Die Server werden in Windows- und Linuxsysteme differenziert. Um detailliertere Informationen zu sehen, klicken Sie den entsprechenden Server an. </p><br>
                         <li><b>2. Details:</b>
-                            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p><br>
+                            <br>
                             <ul style="list-style-position: outside">
                                 <li class="list-padding"><b>2.1. Host Informationen</b>
-                                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p><br>
+                                    <p>Beinhaltet den Hostnamen, das System (Windows oder Linux) und Freitext Felder. Diese Freitext
+                                        Felder können bearbeitet werden. Gehen Sie dazu unter "Host Informationen" auf
+                                        das Register "Bearbeiten".</p><br>
                                 </li>
                                 <li class="list-padding"><b>2.2. Basis Informationen</b>
-                                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p><br>
+                                    <p>Beinhaltet grundlegende Informationen wie IP-Informationen, Volumes, Prozessor/RAM und System Informationen (Betriebsystem, Hersteller, Uptime)</p><br>
                                 </li>
                                 <li class="list-padding"><b>2.3. Performance Informationen</b>
-                                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p><br>
+                                    <p>Beinhaltet die belegung der Volumes und die Auslastung von CPU und RAM. Der
+                                        Zeitraum der Daten kann bei allen Charts zwischen einem Tag, einer Stunde und
+                                        einem Monat gewählt werden. Bei den Disks ist zusätzlich noch eine
+                                        Dropdown-Liste, welche es ermöglicht zwischen den einzelnen Disks zu wechseln</p><br>
                                 </li>
                                 <li class="list-padding"><b>2.4. Verfügbarkeits Informationen</b>
-                                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p><br>
+                                    <p>Beinhaltet die erreichbarkeit des Servers. Dies wird über PING abgefragt. Ein
+                                        Server kann folgende 3 Zustände haben: 0 =
+                                        Nicht erreichbar / 1 = Erreichbar / 2 = Initilaisierung. Initialisierung
+                                        bedeutet das ein Server neu hinzugefügt wurde. Es dient als ein Platzhalter Zustand,
+                                        bis das Availability-Script das erste mal den neu hinzugefügten Server mittels
+                                        PING anspricht.</p><br>
                                 </li>
                             </ul>
                         </li>
@@ -141,11 +147,14 @@ if (isset($_POST['anmeldenButton'])) {
 
                 <!-- START: News tab -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
                 <div id="index_news">
-                    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
-                    dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet
-                    clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet,
-                    consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
-                    sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+                    <p class="bold">Neue Funktionen / Änderungen</p>
+                    <p>Funktion eins. Ermöglicht das einsehen von....</p>
+                    <p>Funktion zwei. Daten können nun....</p>
+                    <p>Funktion drei. Das verwenden von .... ist nun ....</p>
+                    <br>
+                    <p> <b>PowerShell Main-Script:</b> Version 1.1.0</p>
+                    <p> <b>PowerShell Availability-Script:</b> Version 1.0.0</p>
+                    <p> <b>Webportal:</b> Version 1.0.0</p>
                 </div>
                 <!-- END: New tab ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
             </div>

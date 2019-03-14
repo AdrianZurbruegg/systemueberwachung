@@ -57,8 +57,14 @@ td a{
     width: 150vh;
 }
 
+/* Move serverList content up*/
 .content_serverList{
     margin-top: -20px;
+}
+
+/* Move index content down*/
+.content_index {
+    margin-top: 25px;
 }
 
 /* Sets the background color of hovered element */
