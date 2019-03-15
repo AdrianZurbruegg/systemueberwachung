@@ -32,12 +32,6 @@ if (isset($_POST['btn_editHostInfo'])) {
     $updateAvailabilityClass->execute();
 }
 
-// Function which splits arrays by whitespace. Parameter: array to split. Return value: array
-function splitByWhitespace($arrayToSplit){
-    $arrayToSplit = explode(' ', $arrayToSplit);
-    return $arrayToSplit;
-}
-
 /** START: Host information ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 // Select host information and save it to $resultHostInfo variable */
 $statementHostInfo = $pdo->prepare("SELECT hostInfo.*, availabilityClass.type FROM hostInfo JOIN availabilityClass on hostInfo.availabilityClass_id = availabilityClass.ID WHERE hostInfo.ID = $id");
@@ -53,13 +47,13 @@ $resultBasicInfo = $statementBasicInfo->fetchAll();
 // Iterate over the result and split dnsServer, uptime and volumes by whitespace. This is done to display the values later in a clear format.
 foreach ($resultBasicInfo as $row) {
     $dnsServer = $row['dnsServer'];
-    $dnsServerSplitted = splitByWhitespace($dnsServer);
+    $dnsServerSplitted = explode(" ",$dnsServer);
 
     $uptime = $row['uptime'];
-    $uptimeSplitted = splitByWhitespace($uptime);
+    $uptimeSplitted = explode(" ",$uptime);
 
     $volumes = $row['volumes'];
-    $volumesSplitted = splitByWhitespace($volumes);
+    $volumesSplitted = explode(" ",$volumes);
 }
 /** END: Basic information -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
@@ -68,6 +62,72 @@ foreach ($resultBasicInfo as $row) {
 $statementAvailabilityClasses = $pdo->prepare("SELECT * FROM availabilityClass");
 $statementAvailabilityClasses->execute();
 $resultAvailabilityClasses = $statementAvailabilityClasses->fetchAll();
+
+// Select availabilityInfo information
+/** Chart availability Y-Axis values -----------------------------------------------------*/
+// Select performance information from the last 31 days. (Those are x-axis values for the chart)
+$statementAvailabilityInfoMonthY = $pdo->prepare("SELECT cDate, ping FROM availabilityInfo A INNER JOIN (SELECT MAX(cDate) as maxDate FROM availabilityInfo WHERE hostInfo_id = $id AND cDate >= date_sub(NOW(), INTERVAL 31 day) AND cDate <= NOW() GROUP BY CAST(cDate as DATE), DAY(cDate)) AS B ON A.cDate = B.maxDate ORDER BY cDate ASC");
+$statementAvailabilityInfoMonthY->execute();
+$resultAvailabilityInfoMonthY = $statementAvailabilityInfoMonthY->fetchAll();
+
+// Select performance information from the last day. (Those are x-axis values for the chart)
+$statementAvailabilityInfoDayY = $pdo->prepare("SELECT cDate, ping FROM availabilityInfo A INNER JOIN (SELECT MAX(cDate) as maxDate FROM availabilityInfo WHERE hostInfo_id = $id AND cDate >= date_sub(NOW(), INTERVAL 1 DAY) AND cDate <= NOW() GROUP BY CAST(cDate as DATE), HOUR(cDate)) AS B ON A.cDate = B.maxDate ORDER BY cDate ASC");
+$statementAvailabilityInfoDayY->execute();
+$resultAvailabilityInfoDayY = $statementAvailabilityInfoDayY->fetchAll();
+
+// Select performance information from the last hour. (Those are x-axis values for the chart)
+$statementAvailabilityInfoHourY = $pdo->prepare("SELECT cDate, ping FROM availabilityInfo WHERE hostInfo_id = $id AND cDate >= date_sub(NOW(), INTERVAL 1 hour) AND cDate <= NOW() ORDER BY cDate ASC");
+$statementAvailabilityInfoHourY->execute();
+$resultAvailabilityInfoHourY = $statementAvailabilityInfoHourY->fetchAll();
+
+// Iterate over the 3 results and declare arrays for each attribute. (Those are x-axis values for the chart)
+foreach ($resultAvailabilityInfoMonthY as $row) {
+    $ping = $row['ping'];
+    $pingArrayMonthY[] = $ping;
+}
+
+foreach ($resultAvailabilityInfoDayY as $row) {
+    $ping = $row['ping'];
+    $pingArrayDayY[] = $ping;
+}
+
+foreach ($resultAvailabilityInfoHourY as $row) {
+    $ping = $row['ping'];
+    $pingArrayHourY[] = $ping;
+}
+/**--------------------------------------------------------------------*/
+
+/** Chart availability X-Axis values -----------------------------------------------------*/
+// Select performance information from the last 31 days. (Those are y-axis values for the chart)
+$statementAvailabilityInfoMonthX = $pdo->prepare("SELECT MAX(cDate) as cDate FROM availabilityInfo WHERE hostInfo_id = $id AND cDate >= date_sub(NOW(), INTERVAL 31 day) AND cDate <= NOW() GROUP BY CAST(cDate as DATE), DAY(cDate) ORDER BY cDate ASC");
+$statementAvailabilityInfoMonthX->execute();
+$resultAvailabilityInfoMonthX = $statementAvailabilityInfoMonthX->fetchAll();
+
+// Select performance information from the last day. (Those are y-axis values for the chart)
+$statementAvailabilityInfoDayX = $pdo->prepare("SELECT MAX(cDate) as cDate FROM availabilityInfo WHERE hostInfo_id = $id AND cDate >= date_sub(NOW(), INTERVAL 1 DAY) AND cDate <= NOW() GROUP BY CAST(cDate as DATE), HOUR(cDate) ORDER BY cDate ASC");
+$statementAvailabilityInfoDayX->execute();
+$resultAvailabilityInfoDayX = $statementAvailabilityInfoDayX->fetchAll();
+
+// Select performance information from the last hour. (Those are y-axis values for the chart)
+$statementAvailabilityInfoHourX = $pdo->prepare("SELECT cDate FROM availabilityInfo WHERE hostInfo_id = $id AND cDate >= date_sub(NOW(), INTERVAL 1 hour) AND cDate <= NOW() ORDER BY cDate ASC");
+$statementAvailabilityInfoHourX->execute();
+$resultAvailabilityInfoHourX = $statementAvailabilityInfoHourX->fetchAll();
+
+// Iterate over the 3 results, split the array by whitespace and declare an array for each time period. (Those are y-axis values for the chart)
+// Example of how the jsonDataX could look like: "{["2019-01-19"], ["2019-01-20"], ["2019-01-21"]}" etc.
+foreach ($resultAvailabilityInfoMonthX as $row) {
+    $timestamp = $row['cDate'];
+    $availabilityJsonDataMonthX[] = explode(" ",$timestamp)[0];
+}
+foreach ($resultAvailabilityInfoDayX as $row) {
+    $timestamp = $row['cDate'];
+    $availabilityJsonDataDayX[] = explode(" ",$timestamp);
+}
+foreach ($resultAvailabilityInfoHourX as $row) {
+    $timestamp = $row['cDate'];
+    $availabilityJsonDataHourX[] = explode(" ",$timestamp)[1];
+}
+/**--------------------------------------------------------------------*/
 /** END: Availability  ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 /** START: Perfomance info -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -128,8 +188,8 @@ foreach ($resultPerformanceInfoHourY as $row) {
 function arrangeJsonData($diskUsageTime){
     $diskUsages = $diskUsageTime;
     $jsonDataY = array();
-    foreach($diskUsages as $key => $element){
-        $parts = explode(" ",$element);
+    foreach($diskUsages as $key => $diskUsage){
+        $parts = explode(" ",$diskUsage);
         foreach($parts as $part){
             $underParts = explode(',', $part);
             if(isset($underParts[0]) && isset($underParts[1]) ){
@@ -165,15 +225,15 @@ $resultPerformanceInfoHourX = $statementPerformanceInfoHourX->fetchAll();
 // Example of how the jsonDataX could look like: "{["2019-01-19"], ["2019-01-20"], ["2019-01-21"]}" etc.
 foreach ($resultPerformanceInfoMonthX as $row) {
     $timestamp = $row['cDate'];
-    $performanceJsonDataMonthX[] = splitByWhitespace($timestamp)[0];
+    $performanceJsonDataMonthX[] = explode(" ",$timestamp)[0];
 }
 foreach ($resultPerformanceInfoDayX as $row) {
     $timestamp = $row['cDate'];
-    $performanceJsonDataDayX[] = splitByWhitespace($timestamp);
+    $performanceJsonDataDayX[] = explode(" ",$timestamp);
 }
 foreach ($resultPerformanceInfoHourX as $row) {
     $timestamp = $row['cDate'];
-    $performanceJsonDataHourX[] = splitByWhitespace($timestamp)[1];
+    $performanceJsonDataHourX[] = explode(" ",$timestamp)[1];
 }
 
 /**--------------------------------------------------------------------*/
@@ -263,7 +323,7 @@ foreach ($resultPerformanceInfoHourX as $row) {
                                 <td><?php echo $row['hostSystem']; ?></td>
                             </tr>
                             <tr>
-                                <td class="bold">Administrator:</td>
+                                <td class="bold">Systembetreuer:</td>
                                 <td><?php echo $row['systemAdministrator']; ?></td>
                             </tr>
                             <tr>
@@ -292,7 +352,7 @@ foreach ($resultPerformanceInfoHourX as $row) {
                         <div id="edit_hostInfo">
                             <div class="row">
                                 <div class="input-field col s12 m6 l6">
-                                    <p class="text-left bold">Administrator:</p>
+                                    <p class="text-left bold">Systembetreuer:</p>
                                     <input type="text" name="input_administrator" id="input_administrator"
                                            value="<?php echo $row['systemAdministrator']; ?>">
                                 </div>
@@ -537,7 +597,7 @@ foreach ($resultPerformanceInfoHourX as $row) {
                             <option value="choose" selected="selected">Auswählen</option>
                             <!-- Split the diskUsages array to get every volume letter for the dropdown -->
                             <?php
-                            $diskUsages = splitByWhitespace($diskUsages);
+                            $diskUsages = explode(" ",$diskUsages);
                             foreach ($diskUsages as $diskUsage) {
                                 $diskUsageSplitted = explode(",", $diskUsage);
                                 $disk = $diskUsageSplitted[0];
@@ -589,6 +649,46 @@ foreach ($resultPerformanceInfoHourX as $row) {
     </div>
 </div>
 <!-- END: Mainpart Performance information ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------>
+
+<!-- START: Mainpart Availability information --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+<div class="row">
+    <div class="col s12 m11">
+        <div class="card blue-grey darken-1">
+            <div class="card-content white-text">
+                <span class="card-title">Verfügbarkeits Informationen</span>
+            </div>
+            <div class="card-tabs">
+                <ul class="tabs tabs-fixed-width">
+                    <li class="tab"><a class="active" href="#ping_availabilityInfo">Erreichbarkeit</a></li>
+                </ul>
+            </div>
+            <div class="card-content grey lighten-4">
+                <div id="ping_availabilityInfo">
+                    <div class="col s12 m6 l6">
+                        <p class="text-left bold">Zeitspanne:</p>
+                        <select class="form-control browser-default dropdown" id="dd_availabilityInfo_time_ping">
+                            <option value="choose">Auswählen</option>
+                            <option value="hour">Stunde</option>
+                            <option value="day">Tag</option>
+                            <option value="month">Monat</option>
+                        </select>
+                        <br>
+                    </div>
+                    <div class="col s12 m6 l6">
+                        <p class="text-left bold">Legende:</p>
+                        <span class="col s12 m6 l4">0 = Nicht erreichbar</span>
+                        <span class="col s12 m6 l4">1 = Erreichbar</span>
+                        <span class="col s12 m6 l4">2 = Initialisierung</span>
+                        <br>
+                    </div>
+                    <canvas id="pingChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END: Mainpart Availability information ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+
 
 <!-- Include chartjs -->
 <script src="js/http_cdnjs.cloudflare.com_ajax_libs_Chart.js_2.4.0_Chart.js"></script>
@@ -774,6 +874,32 @@ foreach ($resultPerformanceInfoHourX as $row) {
         chartRam.update();
     });
     /* END: Chart RAM ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+    /* START: Chart Availability -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
+    var ctxPing = document.getElementById('pingChart').getContext('2d');
+    var chartPing = generateChart(ctxPing);
+    // Change the y-axis label to 0 - 2 because the ping value is only one of those 3 states.
+    chartPing.options.scales.yAxes[0].ticks.min = 0;
+    chartPing.options.scales.yAxes[0].ticks.max = 2;
+    chartPing.update();
+
+    /* If the time period dropdown is changed, update data */
+    $("#dd_availabilityInfo_time_ping").change(function () {
+
+        /* Checks what value the selected time period is */
+        var selectedTime = $('#dd_availabilityInfo_time_ping :selected').val();
+
+        /* Calls the function setJsonDataXY according to the dropdown selection */
+        if (selectedTime === 'hour'){
+            setJsonDataXY(selectedTime, chartPing,  <?php echo json_encode($availabilityJsonDataHourX); ?>, <?php echo json_encode($pingArrayHourY); ?>);
+        } else if (selectedTime === 'day'){
+            setJsonDataXY(selectedTime, chartPing,  <?php echo json_encode($availabilityJsonDataDayX); ?>, <?php echo json_encode($pingArrayDayY); ?>);
+        } else if (selectedTime === 'month'){
+            setJsonDataXY(selectedTime, chartPing,  <?php echo json_encode($availabilityJsonDataMonthX); ?>, <?php echo json_encode($pingArrayMonthY); ?>);
+        }
+        chartPing.update();
+    });
+    /* END: Chart Availability -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 
 </script>

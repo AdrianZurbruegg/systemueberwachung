@@ -83,11 +83,11 @@ $resultLinux = $statementLinux->fetchAll();
                 <div class="table-scroll">
                     <table id="tbl_serverListWindows" class="highlight tbl_serverList">
                         <tr>
-                            <th width="8%">Ping:</th>
+                            <th width="10%">Erreichbarkeit:</th>
                             <th width="10%">Hostname:</th>
-                            <th width="10%">Administrator:</th>
-                            <th width="20%">Betriebssystem:</th>
-                            <th width="17%">Verfügbarkeitsklasse:</th>
+                            <th width="15%">Systembetreuer:</th>
+                            <th width="15%">Betriebssystem:</th>
+                            <th width="15%">Verfügbarkeitsklasse:</th>
                             <th width="35%">Beschreibung:</th>
                         </tr>
                         <?php foreach ($resultWindows as $row) { ?>
@@ -121,11 +121,11 @@ $resultLinux = $statementLinux->fetchAll();
                 <div class="table-scroll">
                     <table id="tbl_serverListLinux" class="highlight tbl_serverList">
                         <tr>
-                            <th width="8%">Ping:</th>
+                            <th width="10%">Erreichbarkeit:</th>
                             <th width="10%">Hostname:</th>
-                            <th width="10%">Administrator:</th>
-                            <th width="20%">Betriebssystem:</th>
-                            <th width="17%">Verfügbarkeitsklasse:</th>
+                            <th width="15%">Systembetreuer:</th>
+                            <th width="15%">Betriebssystem:</th>
+                            <th width="15%">Verfügbarkeitsklasse:</th>
                             <th width="35%">Beschreibung:</th>
                         </tr>
                         <?php foreach ($resultLinux as $row) { ?>
