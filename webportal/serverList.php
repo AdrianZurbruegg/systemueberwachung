@@ -95,7 +95,7 @@ $resultLinux = $statementLinux->fetchAll();
                                 <td><span class="dot"><?php echo $row['ping']; ?></span></td>
                                 <td>
                                     <!-- Pass the hostInfo id as an url parameter -->
-                                    <a href="details.php?id=<?php echo $row['ID']; ?>"><?php echo $row['hostname']; ?></a>
+                                    <a href="serverDetails.php?id=<?php echo $row['ID']; ?>"><?php echo $row['hostname']; ?></a>
                                 </td>
                                 <td><?php echo $row['systemAdministrator']; ?></td>
                                 <td><?php echo $row['operatingSystem']; ?></td>
@@ -133,7 +133,7 @@ $resultLinux = $statementLinux->fetchAll();
                                 <td><span class="dot"><?php echo $row['ping']; ?></span></td>
                                 <td>
                                     <!-- Pass the hostInfo id as an url parameter -->
-                                    <a href="details.php?id=<?php echo $row['ID']; ?>"><?php echo $row['hostname']; ?></a>
+                                    <a href="serverDetails.php?id=<?php echo $row['ID']; ?>"><?php echo $row['hostname']; ?></a>
                                 </td>
                                 <td><?php echo $row['systemAdministrator']; ?></td>
                                 <td><?php echo $row['operatingSystem']; ?></td>

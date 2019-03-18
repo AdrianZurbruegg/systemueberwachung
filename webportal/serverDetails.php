@@ -275,7 +275,7 @@ foreach ($resultPerformanceInfoHourX as $row) {
         <?php
     } ?>
     <li><a href="index.php">Startseite</a></li>
-    <li><a href="serverList.php">Server Liste</a></li>
+    <li><a href="serverList.php">Serverliste</a></li>
     <div class="divider"></div>
     <div class="credits">
         <p>Made by Adrian Zurbrügg <b>|</b> IPA-Projekt 2019</p>
@@ -348,7 +348,7 @@ foreach ($resultPerformanceInfoHourX as $row) {
 
 
                     <!-- Edit --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
-                    <form action="details.php?id=<?php echo $row['ID']; ?>" method="post">
+                    <form action="serverDetails.php?id=<?php echo $row['ID']; ?>" method="post">
                         <div id="edit_hostInfo">
                             <div class="row">
                                 <div class="input-field col s12 m6 l6">
@@ -717,7 +717,7 @@ foreach ($resultPerformanceInfoHourX as $row) {
             data: {
                 labels: jsonDataX,
                 datasets: [{
-                    label: "Wert in %",
+                    label: "",
                     borderColor: 'rgb(255, 99, 132)',
                     data: jsonDataY,
                 }]

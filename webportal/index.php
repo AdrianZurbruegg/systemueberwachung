@@ -12,7 +12,7 @@ session_start();
 if (isset($_POST['anmeldenButton'])) {
 
     $usernameLogin = htmlspecialchars($_POST['login-username']);
-    $passwortLogin = $_POST['login-password'];
+    $passwortLogin = htmlspecialchars($_POST['login-password']);
     $statement = $pdo->prepare("SELECT * FROM user WHERE username = '$usernameLogin'");
     $statement->execute();
     $user = $statement->fetch();
