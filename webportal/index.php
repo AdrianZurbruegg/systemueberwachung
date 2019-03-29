@@ -33,7 +33,9 @@ if (isset($_POST['anmeldenButton'])) {
 
 <html lang="de">
 <head>
-    <title>test</title>
+    <title>Startseite</title>
+    <!-- Automatic logout after 1440 seconds -->
+    <meta http-equiv="refresh" content="1440;url=logout.php" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta charset="utf-8">
     <link type="text/css" rel="stylesheet" href="css/materialize.min.css"/>
@@ -49,10 +51,8 @@ if (isset($_POST['anmeldenButton'])) {
 <!-- START: Navigation ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 <ul id="slide-out" class="sidenav sidenav-fixed">
     <li>
-        <div class="user-view">
-            <div class="background">
-                <img src="images/IT-Logo.PNG">
-            </div>
+        <div class="background">
+            <img src="images/logo.jpg">
         </div>
     </li>
     <!-- Show username and a logout option if user is logged in -->
@@ -63,8 +63,13 @@ if (isset($_POST['anmeldenButton'])) {
         <div class="divider"></div>
         <?php
     } ?>
-    <li><a href="index.php">Home</a></li>
-    <li><a href="serverList.php">Server Liste</a></li>
+    <li><a href="index.php">Startseite</a></li>
+    <?php if (isset($_SESSION["username"])) {
+        $sessionuser = $_SESSION['username']; ?>
+        <div class="divider"></div>
+        <li><a href="serverList.php">Serverliste</a></li>
+        <?php
+    } ?>
     <div class="divider"></div>
     <div class="credits">
         <p>Made by Adrian Zurbrügg <b>|</b> IPA-Projekt 2019</p>

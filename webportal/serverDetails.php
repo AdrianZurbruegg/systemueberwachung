@@ -66,12 +66,12 @@ $resultAvailabilityClasses = $statementAvailabilityClasses->fetchAll();
 // Select availabilityInfo information
 /** Chart availability Y-Axis values -----------------------------------------------------*/
 // Select performance information from the last 31 days. (Those are x-axis values for the chart)
-$statementAvailabilityInfoMonthY = $pdo->prepare("SELECT cDate, ping FROM availabilityInfo A INNER JOIN (SELECT MAX(cDate) as maxDate FROM availabilityInfo WHERE hostInfo_id = $id AND cDate >= date_sub(NOW(), INTERVAL 31 day) AND cDate <= NOW() GROUP BY CAST(cDate as DATE), DAY(cDate)) AS B ON A.cDate = B.maxDate ORDER BY cDate ASC");
+$statementAvailabilityInfoMonthY = $pdo->prepare("SELECT cDate, ping FROM availabilityInfo A INNER JOIN (SELECT MAX(cDate) as maxDate FROM availabilityInfo WHERE hostInfo_id = $id AND cDate >= date_sub(NOW(), INTERVAL 31 day) AND cDate <= NOW() GROUP BY CAST(cDate as DATE), DAY(cDate)) AS B ON A.cDate = B.maxDate WHERE hostInfo_id = $id ORDER BY cDate ASC");
 $statementAvailabilityInfoMonthY->execute();
 $resultAvailabilityInfoMonthY = $statementAvailabilityInfoMonthY->fetchAll();
 
 // Select performance information from the last day. (Those are x-axis values for the chart)
-$statementAvailabilityInfoDayY = $pdo->prepare("SELECT cDate, ping FROM availabilityInfo A INNER JOIN (SELECT MAX(cDate) as maxDate FROM availabilityInfo WHERE hostInfo_id = $id AND cDate >= date_sub(NOW(), INTERVAL 1 DAY) AND cDate <= NOW() GROUP BY CAST(cDate as DATE), HOUR(cDate)) AS B ON A.cDate = B.maxDate ORDER BY cDate ASC");
+$statementAvailabilityInfoDayY = $pdo->prepare("SELECT cDate, ping FROM availabilityInfo A INNER JOIN (SELECT MAX(cDate) as maxDate FROM availabilityInfo WHERE hostInfo_id = $id AND cDate >= date_sub(NOW(), INTERVAL 1 DAY) AND cDate <= NOW() GROUP BY CAST(cDate as DATE), HOUR(cDate)) AS B ON A.cDate = B.maxDate WHERE hostInfo_id = $id ORDER BY cDate ASC");
 $statementAvailabilityInfoDayY->execute();
 $resultAvailabilityInfoDayY = $statementAvailabilityInfoDayY->fetchAll();
 
@@ -138,7 +138,7 @@ $statementPerformanceInfoMonthY->execute();
 $resultPerformanceInfoMonthY = $statementPerformanceInfoMonthY->fetchAll();
 
 // Select performance information from the last day. (Those are x-axis values for the chart)
-$statementPerformanceInfoDayY = $pdo->prepare("SELECT cDate, diskUsage, cpuUsage, ramUsage FROM performanceInfo A INNER JOIN (SELECT MAX(cDate) as maxDate FROM performanceInfo WHERE hostInfo_id = $id AND cDate >= date_sub(NOW(), INTERVAL 1 DAY) GROUP BY CAST(cDate as DATE), HOUR(cDate)) AS B ON A.cDate = B.maxDate ORDER BY cDate ASC");
+$statementPerformanceInfoDayY = $pdo->prepare("SELECT cDate, diskUsage, cpuUsage, ramUsage FROM performanceInfo A INNER JOIN (SELECT MAX(cDate) as maxDate FROM performanceInfo WHERE hostInfo_id = $id AND cDate >= date_sub(NOW(), INTERVAL 1 DAY) GROUP BY CAST(cDate as DATE), HOUR(cDate)) AS B ON A.cDate = B.maxDate WHERE hostInfo_id = $id ORDER BY cDate ASC");
 $statementPerformanceInfoDayY->execute();
 $resultPerformanceInfoDayY = $statementPerformanceInfoDayY->fetchAll();
 
@@ -764,24 +764,16 @@ foreach ($resultPerformanceInfoHourX as $row) {
         }
     }
 
-    /* Sets the value of jsonDataX and jsonDataY according to the given time span. This could be a hour, a day or a month.
+    /* Sets the value of jsonDataX and jsonDataY.
      * Parameters:
      * period = time period (string)
      * chart = which chart gets the data (object)
      * jsonDataX = contains values of corresponding time period. X-axis. (array)
      * jsonDataY = contains values of the corresponding time period. Y-axis. (array) */
-    function setJsonDataXY(period, chart, jsonDataX, jsonDataY){
+    function setJsonDataXY(chart, jsonDataX, jsonDataY){
         /* Sets the time period (x-axis data) and jsonDataY (y-axis data) */
-        if (period === 'hour') {
             pushDataToChartX(jsonDataX, chart);
             pushDataToChartY(jsonDataY, chart);
-        } else if (period === 'day') {
-            pushDataToChartX(jsonDataX, chart);
-            pushDataToChartY(jsonDataY, chart);
-        } else if (period === 'month') {
-            pushDataToChartX(jsonDataX, chart);
-            pushDataToChartY(jsonDataY, chart);
-        }
     }
 
     /* START: Chart Volumes ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -843,11 +835,11 @@ foreach ($resultPerformanceInfoHourX as $row) {
 
         /* Calls the function setJsonDataXY according to the dropdown selection */
         if (selectedTime === 'hour'){
-            setJsonDataXY(selectedTime, chartCpu,  <?php echo json_encode($performanceJsonDataHourX); ?>, <?php echo json_encode($cpuUsagesArrayHourY); ?>);
+            setJsonDataXY(chartCpu,  <?php echo json_encode($performanceJsonDataHourX); ?>, <?php echo json_encode($cpuUsagesArrayHourY); ?>);
         } else if (selectedTime === 'day'){
-            setJsonDataXY(selectedTime, chartCpu,  <?php echo json_encode($performanceJsonDataDayX); ?>, <?php echo json_encode($cpuUsagesArrayDayY); ?>);
+            setJsonDataXY(chartCpu,  <?php echo json_encode($performanceJsonDataDayX); ?>, <?php echo json_encode($cpuUsagesArrayDayY); ?>);
         } else if (selectedTime === 'month'){
-            setJsonDataXY(selectedTime, chartCpu,  <?php echo json_encode($performanceJsonDataMonthX); ?>, <?php echo json_encode($cpuUsagesArrayMonthY); ?>);
+            setJsonDataXY(chartCpu,  <?php echo json_encode($performanceJsonDataMonthX); ?>, <?php echo json_encode($cpuUsagesArrayMonthY); ?>);
         }
         chartCpu.update();
     });
@@ -865,11 +857,11 @@ foreach ($resultPerformanceInfoHourX as $row) {
 
         /* Calls the function setJsonDataXY according to the dropdown selection */
         if (selectedTime === 'hour'){
-            setJsonDataXY(selectedTime, chartRam,  <?php echo json_encode($performanceJsonDataHourX); ?>, <?php echo json_encode($ramUsagesArrayHourY); ?>);
+            setJsonDataXY(chartRam,  <?php echo json_encode($performanceJsonDataHourX); ?>, <?php echo json_encode($ramUsagesArrayHourY); ?>);
         } else if (selectedTime === 'day'){
-            setJsonDataXY(selectedTime, chartRam,  <?php echo json_encode($performanceJsonDataDayX); ?>, <?php echo json_encode($ramUsagesArrayDayY); ?>);
+            setJsonDataXY(chartRam,  <?php echo json_encode($performanceJsonDataDayX); ?>, <?php echo json_encode($ramUsagesArrayDayY); ?>);
         } else if (selectedTime === 'month'){
-            setJsonDataXY(selectedTime, chartRam,  <?php echo json_encode($performanceJsonDataMonthX); ?>, <?php echo json_encode($ramUsagesArrayMonthY); ?>);
+            setJsonDataXY(chartRam,  <?php echo json_encode($performanceJsonDataMonthX); ?>, <?php echo json_encode($ramUsagesArrayMonthY); ?>);
         }
         chartRam.update();
     });
@@ -891,11 +883,11 @@ foreach ($resultPerformanceInfoHourX as $row) {
 
         /* Calls the function setJsonDataXY according to the dropdown selection */
         if (selectedTime === 'hour'){
-            setJsonDataXY(selectedTime, chartPing,  <?php echo json_encode($availabilityJsonDataHourX); ?>, <?php echo json_encode($pingArrayHourY); ?>);
+            setJsonDataXY(chartPing,  <?php echo json_encode($availabilityJsonDataHourX); ?>, <?php echo json_encode($pingArrayHourY); ?>);
         } else if (selectedTime === 'day'){
-            setJsonDataXY(selectedTime, chartPing,  <?php echo json_encode($availabilityJsonDataDayX); ?>, <?php echo json_encode($pingArrayDayY); ?>);
+            setJsonDataXY(chartPing,  <?php echo json_encode($availabilityJsonDataDayX); ?>, <?php echo json_encode($pingArrayDayY); ?>);
         } else if (selectedTime === 'month'){
-            setJsonDataXY(selectedTime, chartPing,  <?php echo json_encode($availabilityJsonDataMonthX); ?>, <?php echo json_encode($pingArrayMonthY); ?>);
+            setJsonDataXY(chartPing,  <?php echo json_encode($availabilityJsonDataMonthX); ?>, <?php echo json_encode($pingArrayMonthY); ?>);
         }
         chartPing.update();
     });

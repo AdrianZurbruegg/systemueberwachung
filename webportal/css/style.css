@@ -9,9 +9,10 @@ header, body, footer {
     margin-top: -20px;
 }
 
-/* How much of the picture in the navbar is shown */
-.user-view {
-    height: 20vh;
+/* Picture size inside the navbar */
+.background img{
+    max-width: 100%;
+    height: auto;
 }
 
 /* Indent text in navbar */
